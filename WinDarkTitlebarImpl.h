@@ -1,3 +1,11 @@
+#ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+#ifndef ASSERT
+#include <cassert>
+#define ASSERT assert
+#endif
 
 struct WinDarkTitlebarImpl { 
 
@@ -93,4 +101,4 @@ struct WinDarkTitlebarImpl {
   }
 };
 
-// Check the titlebar theme chaning code?
+#endif // WIN32
