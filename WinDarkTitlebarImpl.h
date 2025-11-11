@@ -7,7 +7,7 @@
 #define ASSERT assert
 #endif
 
-struct WinDarkTitlebarImpl { 
+struct WinDarkTitlebarImpl {
 
   enum WINDOWCOMPOSITIONATTRIB
   {
@@ -70,14 +70,14 @@ struct WinDarkTitlebarImpl {
       buildNumber >= 22000);  // Windows 11 builds
   }
 
-  void setTitleBarTheme(HWND hWnd, BOOL dark) { 
-    ASSERT(hWnd); 
+  void setTitleBarTheme(HWND hWnd, BOOL dark) {
+    ASSERT(hWnd);
     ASSERT(::IsWindow(hWnd));
-    if (buildNumber_ < 18362) {
-      SetProp(hWnd, TEXT("UseImmersiveDarkModeColors"), reinterpret_cast<HANDLE>(static_cast<intptr_t>(dark)));
-    } else if (_SetWindowCompositionAttribute) {
+    if (_SetWindowCompositionAttribute) {
       WINDOWCOMPOSITIONATTRIBDATA data = { WCA_USEDARKMODECOLORS, &dark, sizeof(dark) };
       _SetWindowCompositionAttribute(hWnd, &data);
+    } else {
+      SetProp(hWnd, TEXT("UseImmersiveDarkModeColors"), reinterpret_cast<HANDLE>(static_cast<intptr_t>(dark)));
     }
   }
 
@@ -91,10 +91,8 @@ struct WinDarkTitlebarImpl {
       RtlGetNtVersionNumbers(&major, &minor, &buildNumber_);
       buildNumber_ &= ~0xF0000000;
       if (major == 10 && minor == 0 && checkBuildNumber(buildNumber_)) {
-        if (HMODULE hUxtheme = LoadLibraryEx(TEXT("uxtheme.dll"), nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32)) {
-          if (HMODULE hUser32Module = GetModuleHandle(TEXT("user32.dll"))) {
-            _SetWindowCompositionAttribute = reinterpret_cast<fnSetWindowCompositionAttribute>(GetProcAddress(hUser32Module, "SetWindowCompositionAttribute"));
-          }
+        if (HMODULE hUser32 = GetModuleHandle(TEXT("user32.dll"))) {
+          _SetWindowCompositionAttribute = reinterpret_cast<fnSetWindowCompositionAttribute>(GetProcAddress(hUser32, "SetWindowCompositionAttribute"));
         }
       }
     }
