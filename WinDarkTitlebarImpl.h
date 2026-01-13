@@ -1,6 +1,8 @@
 // By https://github.com/nesall (Arman S.)
 #ifdef WIN32
+#ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
 #include <windows.h>
 
 #ifndef ASSERT
